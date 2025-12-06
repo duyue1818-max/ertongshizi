@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儿童识字小报生成器</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 儿童识字小报生成器</h1>
+            <p class="subtitle">为5-9岁儿童生成有趣的识字学习小报</p>
+        </header>
+
+        <!-- API密钥设置区域 -->
+        <section class="api-key-section">
+            <h2>🔑 API设置</h2>
+            <div class="input-group">
+                <label for="apiKey">Nano Banana Pro API密钥：</label>
+                <input type="password" id="apiKey" placeholder="请输入您的API密钥">
+                <button id="saveApiKey" class="btn btn-secondary">保存密钥</button>
+                <span id="apiKeyStatus" class="status"></span>
+            </div>
+        </section>
+
+        <!-- 主题输入区域 -->
+        <section class="input-section">
+            <h2>📝 小报设置</h2>
+            <div class="input-group">
+                <label for="theme">主题/场景：</label>
+                <input type="text" id="theme" placeholder="例如：超市、医院、公园、学校">
+                <div class="quick-themes">
+                    <span>快速选择：</span>
+                    <button class="theme-btn" data-theme="超市">超市</button>
+                    <button class="theme-btn" data-theme="医院">医院</button>
+                    <button class="theme-btn" data-theme="公园">公园</button>
+                    <button class="theme-btn" data-theme="学校">学校</button>
+                    <button class="theme-btn" data-theme="动物园">动物园</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="title">小报标题：</label>
+                <input type="text" id="title" placeholder="例如：快乐超市、动物世界">
+            </div>
+        </section>
+
+        <!-- 词汇预览区域 -->
+        <section class="vocabulary-section">
+            <h2>📚 识字词汇预览</h2>
+            <div class="vocabulary-categories">
+                <div class="vocab-category">
+                    <h3>核心角色与设施</h3>
+                    <div id="coreWords" class="word-list"></div>
+                </div>
+                <div class="vocab-category">
+                    <h3>常见物品/工具</h3>
+                    <div id="itemWords" class="word-list"></div>
+                </div>
+                <div class="vocab-category">
+                    <h3>环境与装饰</h3>
+                    <div id="envWords" class="word-list"></div>
+                </div>
+            </div>
+            <button id="editWords" class="btn btn-secondary">编辑词汇</button>
+        </section>
+
+        <!-- 生成设置 -->
+        <section class="generation-settings">
+            <h2>⚙️ 生成设置</h2>
+            <div class="settings-group">
+                <div class="setting-item">
+                    <label for="aspectRatio">图片比例：</label>
+                    <select id="aspectRatio">
+                        <option value="3:4">竖版 3:4 (A4比例)</option>
+                        <option value="9:16">竖版 9:16 (手机)</option>
+                        <option value="1:1">正方形 1:1</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="resolution">分辨率：</label>
+                    <select id="resolution">
+                        <option value="2K">2K (推荐)</option>
+                        <option value="1K">1K (快速)</option>
+                        <option value="4K">4K (高清)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- 生成按钮 -->
+        <section class="generate-section">
+            <button id="generateBtn" class="btn btn-primary btn-large" disabled>
+                生成识字小报
+            </button>
+        </section>
+
+        <!-- 进度显示 -->
+        <section id="progressSection" class="progress-section" style="display: none;">
+            <h2>🔄 生成进度</h2>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <p id="progressText">正在准备生成...</p>
+        </section>
+
+        <!-- 结果展示 -->
+        <section id="resultSection" class="result-section" style="display: none;">
+            <h2>✨ 生成结果</h2>
+            <div class="result-container">
+                <div class="image-container">
+                    <img id="resultImage" src="" alt="生成的识字小报">
+                </div>
+                <div class="result-actions">
+                    <button id="downloadBtn" class="btn btn-success">
+                        📥 下载图片
+                    </button>
+                    <button id="regenerateBtn" class="btn btn-secondary">
+                        🔄 重新生成
+                    </button>
+                    <button id="saveHistoryBtn" class="btn btn-info">
+                        📌 保存到历史
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 历史记录 -->
+        <section id="historySection" class="history-section">
+            <h2>📚 历史记录</h2>
+            <div id="historyList" class="history-list">
+                <p class="empty-history">暂无历史记录</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- 编辑词汇弹窗 -->
+    <div id="editModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑识字词汇</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="edit-category">
+                    <h4>核心角色与设施</h4>
+                    <textarea id="editCoreWords" rows="3" placeholder="每行一个词，格式：拼音 中文"></textarea>
+                </div>
+                <div class="edit-category">
+                    <h4>常见物品/工具</h4>
+                    <textarea id="editItemWords" rows="5" placeholder="每行一个词，格式：拼音 中文"></textarea>
+                </div>
+                <div class="edit-category">
+                    <h4>环境与装饰</h4>
+                    <textarea id="editEnvWords" rows="3" placeholder="每行一个词，格式：拼音 中文"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveWordsBtn" class="btn btn-primary">保存修改</button>
+                <button id="resetWordsBtn" class="btn btn-secondary">重置为默认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载JavaScript文件 -->
+    <script src="data/vocabulary.js"></script>
+    <script src="js/vocabulary.js"></script>
+    <script src="js/promptGenerator.js"></script>
+    <script src="js/apiService.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
